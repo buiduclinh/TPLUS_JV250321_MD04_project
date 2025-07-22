@@ -78,9 +78,10 @@ public class Phone {
             System.out.println("Nhập tên sản phẩm: ");
             try {
                 String nameInput = scanner.nextLine();
-                ValidateInput.ValidateIsEmpty(nameInput);
+                ValidateInput.isEmpty(nameInput);
                 if (nameInput.length() <= 100) {
                     setName(nameInput);
+                    break;
                 } else {
                     System.out.println("Số lượng ký tự không vượt quá 100 ký tự");
                 }
@@ -95,9 +96,10 @@ public class Phone {
             System.out.println("Nhập nhãn sản phẩm");
             try {
                 String brand = scanner.nextLine();
-                ValidateInput.ValidateIsEmpty(brand);
+                ValidateInput.isEmpty(brand);
                 if (brand.length() <= 100) {
                     setBrand(brand);
+                    break;
                 } else {
                     System.out.println("Số lượng ký tự không vượt quá 100 ký tự");
                 }
@@ -114,10 +116,11 @@ public class Phone {
             System.out.print("Nhập giá sản phẩm: ");
             try {
                 priceInput = scanner.nextLine();
-                if (ValidateInput.ValidateIsFloat(priceInput)) {
+                if (ValidateInput.isFloat(priceInput)) {
                     priceValue = Float.parseFloat(priceInput);
                     if (priceValue > 0) {
                         setPrice(priceValue);
+                        break;
                     } else {
                         System.out.println("Giá nhập vào phải lớn hơn 0");
                     }
@@ -137,10 +140,11 @@ public class Phone {
             System.out.println("Nhập số lượng sản phẩm");
             try {
                 stockInput = scanner.nextLine();
-                if (ValidateInput.validateIsInt(stockInput)) {
+                if (ValidateInput.isInt(stockInput)) {
                     stockValue = Integer.parseInt(stockInput);
                     if (stockValue > 0) {
                         setStock(stockValue);
+                        break;
                     } else {
                         System.out.println("Số lượng tồn nhập vào phải lớn hơn 0");
                     }
@@ -154,26 +158,21 @@ public class Phone {
     }
 
     public int inputId(Scanner scanner) {
-        String IdInput;
-        int IdValue;
-        do {
-            System.out.println("Nhập ID sản phẩm");
-            try {
-                IdInput = scanner.nextLine();
-                if (ValidateInput.validateIsInt(IdInput)) {
-                    IdValue = Integer.parseInt(IdInput);
-                    if (IdValue > 0) {
-                        return IdValue;
-                    } else {
-                        System.out.println("ID nhập vào phải lớn hơn 0");
-                    }
+        while (true) {
+            System.out.print("Nhập ID sản phẩm: ");
+            String idInput = scanner.nextLine().trim();
+
+            if (ValidateInput.isInt(idInput)) {
+                int idValue = Integer.parseInt(idInput);
+                if (idValue > 0) {
+                    return idValue;
                 } else {
-                    System.out.println("ID sản phẩm không hợp lệ. Vui lòng nhập lại!");
+                    System.err.println("ID phải lớn hơn 0. Vui lòng nhập lại!");
                 }
-            } catch (RuntimeException e) {
-                throw new RuntimeException(e);
+            } else {
+                System.err.println("ID không hợp lệ. Chỉ được nhập số nguyên. Vui lòng nhập lại!");
             }
-        } while (true);
+        }
     }
 
     @Override

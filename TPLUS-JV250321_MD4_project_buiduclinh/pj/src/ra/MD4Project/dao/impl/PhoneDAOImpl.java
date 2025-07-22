@@ -40,8 +40,9 @@ public class PhoneDAOImpl implements IPhoneDAO {
 
     @Override
     public boolean updateProduct(Phone product) {
-        String sql = "{CALL update_product(?,?,?,?)}";
+        String sql = "{CALL update_product(?,?,?,?,?)}";
         return DBHelper.executeUpdate(sql,
+                product.getId(),
                 product.getName(),
                 product.getBrand(),
                 product.getPrice(),

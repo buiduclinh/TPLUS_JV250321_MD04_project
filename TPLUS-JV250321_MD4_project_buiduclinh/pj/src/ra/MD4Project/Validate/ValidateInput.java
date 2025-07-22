@@ -1,40 +1,31 @@
 package ra.MD4Project.Validate;
 
-import java.util.Scanner;
-
 public class ValidateInput {
 
-    public static boolean ValidateIsEmpty(String inputData) {
 
-        if (inputData == null || inputData.trim().isEmpty()) {
+    public static boolean isEmpty(String inputData) {
+        return inputData == null || inputData.trim().isEmpty();
+    }
+
+
+    public static boolean isInt(String inputData) {
+        if (isEmpty(inputData)) return false;
+        try {
+            Integer.parseInt(inputData); // Thử parse
             return true;
-        }
-        return false;
-    }
-
-    public static boolean validateIsInt(String inputData) {
-        if (inputData == null || inputData.trim().isEmpty()) {
-            return false; // Rỗng => Không hợp lệ
-        }
-
-        try {
-            Integer.parseInt(inputData); // Thử parse thành số
-            return true; // Parse được => hợp lệ
         } catch (NumberFormatException e) {
-            return false; // Không phải số => không hợp lệ
+            return false;
         }
     }
-    public static boolean ValidateIsFloat(String inputData) {
-        if (inputData == null || inputData.trim().isEmpty()) {
-            return false; // Rỗng => Không hợp lệ
-        }
 
+
+    public static boolean isFloat(String inputData) {
+        if (isEmpty(inputData)) return false;
         try {
-            Float.parseFloat(inputData); // Thử parse thành số
-            return true; // Parse được => hợp lệ
+            Float.parseFloat(inputData); // Thử parse
+            return true;
         } catch (NumberFormatException e) {
-            return false; // Không phải số => không hợp lệ
+            return false;
         }
     }
-
 }

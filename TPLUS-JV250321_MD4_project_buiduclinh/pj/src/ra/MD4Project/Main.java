@@ -1,17 +1,36 @@
 package ra.MD4Project;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
+import ra.MD4Project.Validate.ValidateInput;
+import ra.MD4Project.presetation.PhoneView;
+
+import java.util.Scanner;
+
 public class Main {
     public static void main(String[] args) {
-        //TIP Press <shortcut actionId="ShowIntentionActions"/> with your caret at the highlighted text
-        // to see how IntelliJ IDEA suggests fixing it.
-        System.out.printf("Hello and welcome!");
-
-        for (int i = 1; i <= 5; i++) {
-            //TIP Press <shortcut actionId="Debug"/> to start debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-            // for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>.
-            System.out.println("i = " + i);
-        }
+        Scanner scanner = new Scanner(System.in);
+        do {
+            System.out.println("============ HỆ THỐNG QUẢN LÝ CỬA HÀNG ============");
+            System.out.println("1. Đăng nhập ADMIN");
+            System.out.println("2. Thoát");
+            try {
+                String choice = scanner.nextLine();
+                if (ValidateInput.isInt(choice)) {
+                    int option = Integer.parseInt(choice);
+                    switch (option) {
+                        case 1:
+                            PhoneView.PhoneViewPresentation();
+                            break;
+                        case 2:
+                            System.exit(0);
+                        default:
+                            System.out.println("Lựa chọn không hợp lệ!");
+                    }
+                } else {
+                    System.out.println("Lựa chọn không hợp lệ!");
+                }
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        } while (true);
     }
 }

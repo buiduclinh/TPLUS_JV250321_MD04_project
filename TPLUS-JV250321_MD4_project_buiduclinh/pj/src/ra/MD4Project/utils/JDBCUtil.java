@@ -6,13 +6,13 @@ import java.sql.SQLException;
 
 public class JDBCUtil {
     private static JDBCUtil instance;
-    private static final String URL = "jdbc:mysql://localhost:3306/phonedatabase";
+    private static final String URL = "jdbc:mysql://localhost:3306/phone_database";
     private static final String USER = "root";
     private static final String PASSWORD = "123456789";
 
     private JDBCUtil() {
         try {
-            Class.forName("com.mysql.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
