@@ -1,7 +1,7 @@
 package ra.MD4Project;
 
 import ra.MD4Project.Validate.ValidateInput;
-import ra.MD4Project.presetation.PhoneView;
+import ra.MD4Project.presetation.login.Impl.Login;
 
 import java.util.Scanner;
 
@@ -18,7 +18,8 @@ public class Main {
                     int option = Integer.parseInt(choice);
                     switch (option) {
                         case 1:
-                            PhoneView.PhoneViewPresentation();
+                            Login login = new Login();
+                            Login.LoginPresentation();
                             break;
                         case 2:
                             System.exit(0);

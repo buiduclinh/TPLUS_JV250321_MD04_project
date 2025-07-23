@@ -1,6 +1,6 @@
 package ra.MD4Project.presetation;
 
-import ra.MD4Project.Model.Phone;
+import ra.MD4Project.model.Phone;
 import ra.MD4Project.Validate.ValidateInput;
 import ra.MD4Project.business.IPhoneService;
 import ra.MD4Project.business.impl.PhoneServiceImpl;
@@ -70,7 +70,7 @@ public class PhoneView {
     private static void displayProducts() {
         List<Phone> products = phoneService.displayProduct();
         if (products.isEmpty()) {
-            System.out.println("📭 Không có sản phẩm nào trong danh sách.");
+            System.out.println("Không có sản phẩm nào trong danh sách.");
         } else {
             products.forEach(System.out::println);
         }
@@ -113,16 +113,16 @@ public class PhoneView {
                             choiceValue = Integer.parseInt(choice);
                             switch (choiceValue) {
                                 case 1:
-                                    product.inputName(scanner);
+                                    productIsExist.inputName(scanner);
                                     break;
                                 case 2:
-                                    product.inputBrand(scanner);
+                                    productIsExist.inputBrand(scanner);
                                     break;
                                 case 3:
-                                    product.inputPrice(scanner);
+                                    productIsExist.inputPrice(scanner);
                                     break;
                                 case 4:
-                                    product.inputStock(scanner);
+                                    productIsExist.inputStock(scanner);
                                     break;
                                 case 5:
                                     backToPhoneServiceMenu = true;
@@ -138,7 +138,7 @@ public class PhoneView {
                     }
                 } while (!backToPhoneServiceMenu);
             }
-            boolean result = phoneService.updateProduct(product);
+            boolean result = phoneService.updateProduct(productIsExist);
             if (result) {
                 System.out.println("Cập nhật thành công sản phẩm!");
             } else {

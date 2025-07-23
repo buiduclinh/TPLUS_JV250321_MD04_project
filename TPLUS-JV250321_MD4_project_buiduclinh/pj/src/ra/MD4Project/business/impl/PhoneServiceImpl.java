@@ -1,6 +1,6 @@
 package ra.MD4Project.business.impl;
 
-import ra.MD4Project.Model.Phone;
+import ra.MD4Project.model.Phone;
 import ra.MD4Project.business.IPhoneService;
 import ra.MD4Project.dao.IPhoneDAO;
 import ra.MD4Project.dao.impl.PhoneDAOImpl;

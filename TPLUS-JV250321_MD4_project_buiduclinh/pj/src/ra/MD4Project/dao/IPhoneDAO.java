@@ -1,6 +1,6 @@
 package ra.MD4Project.dao;
 
-import ra.MD4Project.Model.Phone;
+import ra.MD4Project.model.Phone;
 
 import java.util.List;
 

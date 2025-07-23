@@ -1,10 +1,8 @@
 package ra.MD4Project.business;
 
 
-import ra.MD4Project.Model.Phone;
+import ra.MD4Project.model.Phone;
 
-import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 public interface IPhoneService {
