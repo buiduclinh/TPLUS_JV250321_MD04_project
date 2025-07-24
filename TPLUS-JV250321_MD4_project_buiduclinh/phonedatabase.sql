@@ -312,3 +312,252 @@ BEGIN
     WHERE email = find_customer_email;
 END $$
 DELIMITER ;
+
+
+-- Hiển thị danh sách hóa đơn
+DELIMITER $$
+CREATE PROCEDURE get_all_invoice_information()
+BEGIN
+    SELECT * FROM invoice;
+END $$
+DELIMITER ;
+
+# id           INT PRIMARY KEY AUTO_INCREMENT,     -- mã hóa đơn
+#     customer_id  INT,                                -- mã người dùng
+#     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP, -- ngày tạo hóa đơn
+#     total_amount DECIMAL(12, 2) NOT NULL
+
+-- tạo bảng trung gian tạm thời lưu giá trị trước khi lưu bảng chính
+
+# CREATE TABLE invoice_temp_details
+# (
+#     product_id INT            NOT NULL,
+#     quantity   INT            NOT NULL,
+#     unit_price DECIMAL(12, 2)
+# );
+#
+#
+# -- nhập dữ liệu bảng phụ
+#
+#
+# DELIMITER $$
+# CREATE PROCEDURE add_temp_invoice_detail(
+#     IN in_product_id INT,
+#     IN in_quantity INT
+# )
+# BEGIN
+#
+#     SET @insert_from_product_price = (SELECT price
+#     FROM product
+#     WHERE id = in_product_id);
+#
+#     SELECT @insert_from_product_price;
+#
+#     -- Thêm vào bảng tạm
+#     INSERT INTO invoice_temp_details(product_id, quantity, unit_price)
+#     VALUES (in_product_id, in_quantity, @insert_from_product_price);
+# END$$
+# DELIMITER ;
+#
+# CALL add_temp_invoice_detail(1,2);
+#
+# -- Thêm mới hóa đơn và chi tiết hóa đơn
+# DELIMITER $$
+# CREATE PROCEDURE add_invoice_with_details(
+#     IN in_customer_id INT
+# )
+# BEGIN
+#     DECLARE new_invoice_id INT;
+#     -- Thêm hóa đơn mới vào bảng invoice
+#     START TRANSACTION;
+#     INSERT INTO invoice(customer_id, total_amount)
+#     VALUES (in_customer_id, 0);
+#     -- Lấy ID của hóa đơn vừa thêm
+#     SET new_invoice_id = LAST_INSERT_ID();
+#     -- Insert danh sách sản phẩm vào bảng tạm invoice_temp_details
+#     INSERT INTO invoice_details(invoice_id, product_id, quantity, unit_price)
+#     SELECT new_invoice_id,
+#            product_id,
+#            quantity,
+#            unit_price
+#     FROM invoice_temp_details;
+#     -- Trigger sẽ tự động tính lại total_amount
+#     -- Xoá dữ liệu tạm nếu cần
+#     DELETE FROM invoice_temp_details;
+#     COMMIT;
+#
+#     SELECT new_invoice_id AS created_invoice_id;
+# END$$
+# DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER trg_after_insert_invoice_details
+    AFTER INSERT
+    ON invoice_details
+    FOR EACH ROW
+BEGIN
+    UPDATE invoice
+    SET total_amount = (SELECT SUM(quantity * unit_price)
+                        FROM invoice_details
+                        WHERE invoice_id = NEW.invoice_id)
+    WHERE id = NEW.invoice_id;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER trg_after_update_invoice_details
+    AFTER UPDATE
+    ON invoice_details
+    FOR EACH ROW
+BEGIN
+    UPDATE invoice
+    SET total_amount = (SELECT SUM(quantity * unit_price)
+                        FROM invoice_details
+                        WHERE invoice_id = NEW.invoice_id)
+    WHERE id = NEW.invoice_id;
+END$$
+DELIMITER ;
+
+
+DELIMITER $$
+CREATE TRIGGER trg_after_delete_invoice_details
+    AFTER DELETE
+    ON invoice_details
+    FOR EACH ROW
+BEGIN
+    UPDATE invoice
+    SET total_amount = (SELECT IFNULL(SUM(quantity * unit_price), 0)
+                        FROM invoice_details
+                        WHERE invoice_id = OLD.invoice_id)
+    WHERE id = OLD.invoice_id;
+END$$
+DELIMITER ;
+
+-- tìm kiếm hóa đơn theo tên khách hàng
+
+DELIMITER $$
+CREATE PROCEDURE find_invoice_by_customer_name(
+    in_customer_name VARCHAR(100)
+)
+BEGIN
+    SELECT c.id AS customer_id, c.name AS customer_name, idt.*, i.total_amount
+    FROM invoice_details AS idt
+             INNER JOIN customer AS c
+             INNER JOIN invoice AS i
+                        ON c.id = i.customer_id
+                            AND i.id = idt.invoice_id
+    WHERE c.name LIKE CONCAT('%', in_customer_name, '%');
+END $$
+DELIMITER ;
+
+-- tìm kiếm hóa đơn theo ngày tháng năm
+DELIMITER $$
+CREATE PROCEDURE find_invoice_by_created_at(
+    IN in_created_at DATETIME
+)
+BEGIN
+    SELECT i.id   AS invoice_id,
+           i.created_at,
+           c.id   AS customer_id,
+           c.name AS customer_name,
+           idt.product_id,
+           idt.quantity,
+           idt.unit_price,
+           i.total_amount
+    FROM invoice_details AS idt
+             INNER JOIN invoice AS i ON i.id = idt.invoice_id
+             INNER JOIN customer AS c ON c.id = i.customer_id
+    WHERE DATE(i.created_at) LIKE CONCAT('%', DATE(in_created_at), '%');
+END $$
+DELIMITER ;
+
+
+-- thống kê doanh thu theo ngày
+DELIMITER $$
+CREATE PROCEDURE total_amount_date_by_day(
+    IN in_date DATETIME
+)
+BEGIN
+    SELECT SUM(total_amount)
+    FROM invoice
+    WHERE created_at LIKE CONCAT('%', in_date, '%');
+END $$
+DELIMITER ;
+
+-- thống kê doanh thu theo tháng
+
+DELIMITER $$
+CREATE PROCEDURE total_amount_date_by_month(
+    IN in_date DATETIME
+)
+BEGIN
+    SELECT SUM(total_amount)
+    FROM invoice
+    WHERE created_at LIKE CONCAT('%', MONTH(in_date), '%')
+      AND YEAR(created_at) = YEAR(in_date);
+END $$
+DELIMITER ;
+
+-- thống kê doanh thu theo năm
+DELIMITER $$
+CREATE PROCEDURE total_amount_date_by_year(
+    IN in_date DATETIME
+)
+BEGIN
+    SELECT SUM(total_amount)
+    FROM invoice
+    WHERE YEAR(created_at) LIKE CONCAT('%', YEAR(in_date), '%');
+END $$
+DELIMITER ;
+
+
+-- thêm mới hóa đơn
+# DROP PROCEDURE add_invoice;
+DELIMITER $$
+CREATE PROCEDURE add_invoice(
+    IN in_customer_id int,
+    OUT out_invoice_id int
+)
+BEGIN
+    INSERT INTO invoice (customer_id, total_amount)
+        VALUE (in_customer_id, 0);
+    SET out_invoice_id = LAST_INSERT_ID();
+END $$
+DELIMITER ;
+
+
+-- thêm chi tiết hóa đơn
+# DROP PROCEDURE add_invoice_details;
+DELIMITER $$
+CREATE PROCEDURE add_invoice_details(
+    IN in_invoice_id int,
+    IN in_product_id int,
+    IN in_quantity int
+)
+BEGIN
+    DECLARE product_price DECIMAL(10, 2);
+    SELECT price
+    INTO product_price
+    FROM product
+    WHERE id = in_product_id;
+
+    INSERT INTO invoice_details(invoice_id, product_id, quantity, unit_price)
+    VALUES (in_invoice_id, in_product_id, in_quantity, product_price);
+
+END $$
+DELIMITER ;
+
+
+-- tìm kiếm hóa đơn theo id
+DELIMITER $$
+CREATE PROCEDURE find_invoice_id(
+    IN in_invoice_id int
+)
+BEGIN
+    SELECT *
+    FROM invoice
+    WHERE id = in_invoice_id;
+END $$
+DELIMITER ;
