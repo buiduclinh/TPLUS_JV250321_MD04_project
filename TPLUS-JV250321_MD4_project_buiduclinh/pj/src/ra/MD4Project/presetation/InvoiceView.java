@@ -109,7 +109,8 @@ public class InvoiceView {
                                 System.out.println("Tên khách hàng không được để trống.");
                             } else {
                                 List<Invoice> invoiceList = invoiceService.getInvoicesByCustomer(customerName);
-                                if (invoiceList.isEmpty()) {
+                                System.out.println(invoiceList);
+                                if (invoiceList != null && invoiceList.isEmpty()) {
                                     System.out.println("Không tìm thấy sản phẩm nào với tên khách hàng này.");
                                 } else {
                                     invoiceList.forEach(System.out::println);
@@ -122,7 +123,7 @@ public class InvoiceView {
                             LocalDate localDate = invoice.inputCreatedAt(scanner);
 
                             List<Invoice> invoiceList = invoiceService.getInvoicesByCreatedDate(localDate);
-                            if (invoiceList.isEmpty()) {
+                            if (invoiceList != null && invoiceList.isEmpty()) {
                                 System.out.println("Không tìm thấy hóa đơn nào với ngày tháng năm đã nhập!");
                             } else {
                                 System.out.println("Hóa đơn với " + localDate);

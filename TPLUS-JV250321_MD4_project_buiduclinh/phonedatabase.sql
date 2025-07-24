@@ -442,20 +442,25 @@ CREATE PROCEDURE find_invoice_by_customer_name(
     in_customer_name VARCHAR(100)
 )
 BEGIN
-    SELECT c.id AS customer_id, c.name AS customer_name, idt.*, i.total_amount
+    SELECT c.id   AS customer_id,
+           c.name AS customer_name,
+           idt.*,
+           i.total_amount,
+           i.created_at
     FROM invoice_details AS idt
-             INNER JOIN customer AS c
-             INNER JOIN invoice AS i
-                        ON c.id = i.customer_id
-                            AND i.id = idt.invoice_id
+             INNER JOIN invoice AS i ON i.id = idt.invoice_id
+             INNER JOIN customer AS c ON c.id = i.customer_id
     WHERE c.name LIKE CONCAT('%', in_customer_name, '%');
 END $$
 DELIMITER ;
 
+CALL find_invoice_by_customer_name('hoang');
+
+
 -- tìm kiếm hóa đơn theo ngày tháng năm
 DELIMITER $$
 CREATE PROCEDURE find_invoice_by_created_at(
-    IN in_created_at DATETIME
+    IN in_created_at DATE
 )
 BEGIN
     SELECT i.id   AS invoice_id,
@@ -472,38 +477,43 @@ BEGIN
     WHERE DATE(i.created_at) LIKE CONCAT('%', DATE(in_created_at), '%');
 END $$
 DELIMITER ;
+CALL find_invoice_by_created_at('2025/07/24');
 
 
 -- thống kê doanh thu theo ngày
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_day(
-    IN in_date DATETIME
+    IN in_date DATE
 )
 BEGIN
     SELECT SUM(total_amount)
     FROM invoice
-    WHERE created_at LIKE CONCAT('%', in_date, '%');
+    WHERE DAY(created_at) LIKE CONCAT('%', DAY(in_date), '%');
 END $$
 DELIMITER ;
+CALL total_amount_date_by_day('2025/07/24');
+
 
 -- thống kê doanh thu theo tháng
 
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_month(
-    IN in_date DATETIME
+    IN in_date DATE
 )
 BEGIN
     SELECT SUM(total_amount)
     FROM invoice
-    WHERE created_at LIKE CONCAT('%', MONTH(in_date), '%')
-      AND YEAR(created_at) = YEAR(in_date);
+    WHERE MONTH(created_at) LIKE CONCAT('%', MONTH(in_date), '%')
+      AND YEAR(created_at) LIKE CONCAT('%', YEAR(in_date), '%');
 END $$
 DELIMITER ;
+CALL total_amount_date_by_month('2025/07/24');
+
 
 -- thống kê doanh thu theo năm
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_year(
-    IN in_date DATETIME
+    IN in_date DATE
 )
 BEGIN
     SELECT SUM(total_amount)
@@ -511,7 +521,7 @@ BEGIN
     WHERE YEAR(created_at) LIKE CONCAT('%', YEAR(in_date), '%');
 END $$
 DELIMITER ;
-
+CALL total_amount_date_by_year('2025/07/24');
 
 -- thêm mới hóa đơn
 # DROP PROCEDURE add_invoice;
@@ -545,7 +555,6 @@ BEGIN
 
     INSERT INTO invoice_details(invoice_id, product_id, quantity, unit_price)
     VALUES (in_invoice_id, in_product_id, in_quantity, product_price);
-
 END $$
 DELIMITER ;
 

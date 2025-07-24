@@ -5,10 +5,7 @@ import ra.MD4Project.model.Invoice;
 import ra.MD4Project.utils.DBHelper;
 import ra.MD4Project.utils.JDBCUtil;
 
-import java.sql.CallableStatement;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.sql.Types;
+import java.sql.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -64,81 +61,118 @@ public class InvoiceDAOImpl implements IInvoiceDAO {
     @Override
     public List<Invoice> getInvoiceByCustomerName(String name) {
         String sql = "{CALL find_invoice_by_customer_name(?)}";
-        return DBHelper.executeQuery(sql, rs -> {
-            List<Invoice> invoiceList = new ArrayList<>();
-            while (rs.next()) {
+        List<Invoice> invoiceList = new ArrayList<>();
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callableStatement = connection.prepareCall(sql)) {
+            callableStatement.setString(1, name);
+            ResultSet resultSet = callableStatement.executeQuery();
+            while (resultSet.next()) {
                 Invoice invoice = new Invoice();
-                invoice.setCustomerName(rs.getString("customer_name"));
-                invoice.setId(rs.getInt("id"));
-                invoice.setCustomerId(rs.getInt("customer_id"));
-                invoice.setCreatedAt(LocalDateTime.parse(rs.getString("created_at"),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(rs.getDouble("total_amount"));
+                invoice.setId(resultSet.getInt("invoice_id"));
+                invoice.setCustomerId(resultSet.getInt("customer_id"));
+                invoice.setCustomerName(resultSet.getString("customer_name"));
+                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
                 invoiceList.add(invoice);
             }
-            return invoiceList;
-        }, name);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoiceList;
     }
 
     @Override
     public List<Invoice> getInvoiceByDate(LocalDate date) {
         String sql = "{CALL find_invoice_by_created_at(?)}";
-        return DBHelper.executeQuery(sql, rs -> {
-            List<Invoice> invoiceList = new ArrayList<>();
-            while (rs.next()) {
+        List<Invoice> invoiceList = new ArrayList<>();
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callableStatement = connection.prepareCall(sql)) {
+            callableStatement.setDate(1, Date.valueOf(date));
+            ResultSet resultSet = callableStatement.executeQuery();
+            while (resultSet.next()) {
                 Invoice invoice = new Invoice();
-                invoice.setCustomerName(rs.getString("customer_name"));
-                invoice.setId(rs.getInt("id"));
-                invoice.setCustomerId(rs.getInt("customer_id"));
-                invoice.setCreatedAt(LocalDateTime.parse(rs.getString("created_at"),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(rs.getDouble("total_amount"));
+                invoice.setId(resultSet.getInt("invoice_id"));
+                invoice.setCustomerId(resultSet.getInt("customer_id"));
+                invoice.setCustomerName(resultSet.getString("customer_name"));
+                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
                 invoiceList.add(invoice);
             }
-            return invoiceList;
-        }, date);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoiceList;
     }
 
     @Override
     public List<Invoice> getTotalAmountByDay(LocalDate date, double amount) {
         String sql = "{CALL total_amount_date_by_day(?)}";
-        return DBHelper.executeQuery(sql, rs -> {
-            List<Invoice> invoiceList = new ArrayList<>();
-            while (rs.next()) {
+        List<Invoice> invoiceList = new ArrayList<>();
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callableStatement = connection.prepareCall(sql)) {
+            callableStatement.setDate(1, Date.valueOf(date));
+            callableStatement.setDouble(2, amount);
+            ResultSet resultSet = callableStatement.executeQuery();
+            while (resultSet.next()) {
                 Invoice invoice = new Invoice();
-                invoice.setCreatedAt(LocalDateTime.parse(rs.getString("created_at"),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(rs.getDouble("total_amount"));
+                invoice.setId(resultSet.getInt("invoice_id"));
+                invoice.setCustomerId(resultSet.getInt("customer_id"));
+                invoice.setCustomerName(resultSet.getString("customer_name"));
+                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
                 invoiceList.add(invoice);
             }
-            return invoiceList;
-        }, date, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoiceList;
     }
 
     @Override
     public List<Invoice> getTotalAmountByMonth(LocalDate date, double amount) {
         String sql = "{CALL total_amount_date_by_month(?)}";
-        return DBHelper.executeQuery(sql, rs -> {
-            List<Invoice> invoiceList = new ArrayList<>();
-            while (rs.next()) {
+        List<Invoice> invoiceList = new ArrayList<>();
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callableStatement = connection.prepareCall(sql)) {
+            callableStatement.setDate(1, Date.valueOf(date));
+            callableStatement.setDouble(2, amount);
+            ResultSet resultSet = callableStatement.executeQuery();
+            while (resultSet.next()) {
                 Invoice invoice = new Invoice();
-                invoice.setCreatedAt(LocalDateTime.parse(rs.getString("created_at"),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(rs.getDouble("total_amount"));
+                invoice.setId(resultSet.getInt("invoice_id"));
+                invoice.setCustomerId(resultSet.getInt("customer_id"));
+                invoice.setCustomerName(resultSet.getString("customer_name"));
+                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
                 invoiceList.add(invoice);
             }
-            return invoiceList;
-        }, date, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoiceList;
     }
 
     @Override
     public List<Invoice> getTotalAmountByYear(LocalDate date, double amount) {
         String sql = "{CALL total_amount_date_by_year(?)}";
-        return DBHelper.executeQuery(sql, rs -> {
-            List<Invoice> invoiceList = new ArrayList<>();
-            while (rs.next()) {
+        List<Invoice> invoiceList = new ArrayList<>();
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callableStatement = connection.prepareCall(sql)) {
+            callableStatement.setDate(1, Date.valueOf(date));
+            callableStatement.setDouble(2, amount);
+            ResultSet resultSet = callableStatement.executeQuery();
+            while (resultSet.next()) {
                 Invoice invoice = new Invoice();
-                invoice.setCreatedAt(LocalDateTime.parse(rs.getString("created_at"),DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(rs.getDouble("total_amount"));
+                invoice.setId(resultSet.getInt("invoice_id"));
+                invoice.setCustomerId(resultSet.getInt("customer_id"));
+                invoice.setCustomerName(resultSet.getString("customer_name"));
+                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
                 invoiceList.add(invoice);
             }
-            return invoiceList;
-        }, date, amount);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return invoiceList;
     }
 }

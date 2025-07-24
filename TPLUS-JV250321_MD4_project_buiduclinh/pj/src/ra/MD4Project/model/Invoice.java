@@ -7,6 +7,7 @@ import ra.MD4Project.dao.impl.CustomerDAOImpl;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
 public class Invoice {
@@ -104,21 +105,18 @@ public class Invoice {
     }
 
     public LocalDate inputCreatedAt(Scanner scanner) {
-        while (true) {
-            System.out.println("Nhập vào ngày tháng cần tìm kiếm (dd/MM/yyyy):");
-            String inputDate = scanner.nextLine().trim();
-            if (ValidateInput.isEmpty(inputDate)) {
-                System.out.println("Ngày tháng năm không được để trống!");
-                continue;
-            }
-            if (ValidateInput.isValidLocalDate(inputDate, "dd/MM/yyyy")) {
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-                LocalDate localDate = LocalDate.parse(inputDate, formatter);
-                return localDate;
-            } else {
-                System.out.println("Định dạng ngày tháng nhập vào phải là dd/MM/yyyy! Vui lòng nhập lại!");
+        LocalDate date = null;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        while (date == null) {
+            System.out.print("Nhập ngày tạo hóa đơn (định dạng yyyy-MM-dd): ");
+            String input = scanner.nextLine();
+            try {
+                date = LocalDate.parse(input, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Ngày không hợp lệ. Vui lòng nhập lại đúng định dạng (ví dụ: 2024-12-31).");
             }
         }
+        return date;
     }
 
     @Override
