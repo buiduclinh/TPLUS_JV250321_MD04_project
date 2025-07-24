@@ -1,10 +1,14 @@
 package ra.MD4Project.model;
 
 import ra.MD4Project.Validate.ValidateInput;
+import ra.MD4Project.dao.ICustomerDAO;
+import ra.MD4Project.dao.impl.CustomerDAOImpl;
 
 import java.util.Scanner;
 
 public class Customer {
+    private ICustomerDAO customerDAO;
+
     private int id;
     private String name;
     private String email;
@@ -26,6 +30,7 @@ public class Customer {
     }
 
     public Customer() {
+        customerDAO = new CustomerDAOImpl();
     }
 
     ;
@@ -115,13 +120,17 @@ public class Customer {
             System.out.println("Nhập email khách hàng: ");
             try {
                 String emailInput = scanner.nextLine();
-                if(ValidateInput.isEmpty(emailInput)){
+                if (ValidateInput.isEmpty(emailInput)) {
                     setEmail(emailInput);
                     break;
                 }
                 if (emailInput.length() <= 100 && ValidateInput.isEmail(emailInput)) {
-                    setEmail(emailInput);
-                    break;
+                    if (customerDAO.getCustomerByEmail(emailInput) == null) {
+                        setEmail(emailInput);
+                        break;
+                    } else {
+                        System.out.println("Email đã tồn tại! Vui lòng thử lại!");
+                    }
                 } else {
                     System.out.println("Email nhập vào chưa đúng định dạng!");
                 }
@@ -136,7 +145,7 @@ public class Customer {
             System.out.println("Nhập số điện thoại khách hàng: ");
             try {
                 String phoneInput = scanner.nextLine();
-                if(ValidateInput.isEmpty(phoneInput)){
+                if (ValidateInput.isEmpty(phoneInput)) {
                     setPhone(phoneInput);
                     break;
                 }

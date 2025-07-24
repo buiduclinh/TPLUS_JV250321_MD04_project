@@ -1,5 +1,9 @@
 package ra.MD4Project.Validate;
 
+import javax.management.StringValueExp;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.regex.Pattern;
 
 public class ValidateInput {
@@ -39,5 +43,16 @@ public class ValidateInput {
     public static boolean isPhone(String inputData) {
         String phoneRegex = "^(0[1-9])+([0-9]{8,9})$"; // Số bắt đầu từ 0 + 9~10 số
         return Pattern.matches(phoneRegex, inputData);
+    }
+
+
+    public static boolean isValidLocalDate(String dateStr, String pattern) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+            LocalDate.parse(dateStr, formatter); // thử parse
+            return true; // Hợp lệ
+        } catch (DateTimeParseException e) {
+            return false; // Không hợp lệ
+        }
     }
 }

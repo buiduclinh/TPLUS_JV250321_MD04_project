@@ -29,6 +29,7 @@ public class MainMenu {
                             CustomerView.CustomerViewPresentation();
                             break;
                         case 3:
+                            InvoiceView.InvoiceViewPresentation();
                             break;
                         case 4:
                             break;

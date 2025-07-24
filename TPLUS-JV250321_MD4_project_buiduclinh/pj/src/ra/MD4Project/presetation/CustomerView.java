@@ -18,7 +18,7 @@ public class CustomerView {
         boolean next = false;
         do {
             try {
-                System.out.println("========== Quản lý khách hàng ==========");
+                System.out.println("========== QUẢN LÝ KHÁCH HÀNG ==========");
                 System.out.println("1. Hiển thị danh sách khách hàng");
                 System.out.println("2. Thêm khách hàng mới");
                 System.out.println("3. Cập nhật thông tin khách hàng");
