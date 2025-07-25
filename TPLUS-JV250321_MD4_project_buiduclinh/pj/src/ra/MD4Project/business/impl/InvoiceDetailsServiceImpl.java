@@ -5,6 +5,8 @@ import ra.MD4Project.dao.IInvoiceDetailsDAO;
 import ra.MD4Project.dao.impl.InvoiceDetailsDAOImpl;
 import ra.MD4Project.model.InvoiceDetails;
 
+import java.util.List;
+
 public class InvoiceDetailsServiceImpl implements IInvoiceDetailsService {
     private IInvoiceDetailsDAO invoiceDetailsDAO;
 
@@ -13,7 +15,7 @@ public class InvoiceDetailsServiceImpl implements IInvoiceDetailsService {
     }
 
     @Override
-    public boolean addInvoiceDetails(InvoiceDetails invoiceDetails) {
+    public boolean addInvoiceDetails(List<InvoiceDetails> invoiceDetails) {
         return invoiceDetailsDAO.addInvoiceDetails(invoiceDetails);
     }
 }

@@ -16,6 +16,11 @@ public class PhoneServiceImpl implements IPhoneService {
     }
 
     @Override
+    public int getStockProductById(int id) {
+        return phoneDAO.getStockProductById(id);
+    }
+
+    @Override
     public List<Phone> displayProduct() {
         return phoneDAO.getAllProduct();
     }

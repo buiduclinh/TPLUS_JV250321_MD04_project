@@ -2,6 +2,7 @@ package ra.MD4Project.dao.impl;
 
 import ra.MD4Project.dao.IInvoiceDAO;
 import ra.MD4Project.model.Invoice;
+import ra.MD4Project.model.StatiticsInovice;
 import ra.MD4Project.utils.DBHelper;
 import ra.MD4Project.utils.JDBCUtil;
 
@@ -105,74 +106,67 @@ public class InvoiceDAOImpl implements IInvoiceDAO {
     }
 
     @Override
-    public List<Invoice> getTotalAmountByDay(LocalDate date, double amount) {
-        String sql = "{CALL total_amount_date_by_day(?)}";
-        List<Invoice> invoiceList = new ArrayList<>();
+    public StatiticsInovice getTotalAmountByDay(int day, int month, int year) {
+        String sql = "{CALL total_amount_date_by_day(?,?,?)}";
         try (Connection connection = JDBCUtil.getInstance().getConnection();
              CallableStatement callableStatement = connection.prepareCall(sql)) {
-            callableStatement.setDate(1, Date.valueOf(date));
-            callableStatement.setDouble(2, amount);
+            callableStatement.setInt(1, day);
+            callableStatement.setInt(2, month);
+            callableStatement.setInt(3, year);
             ResultSet resultSet = callableStatement.executeQuery();
-            while (resultSet.next()) {
-                Invoice invoice = new Invoice();
-                invoice.setId(resultSet.getInt("invoice_id"));
-                invoice.setCustomerId(resultSet.getInt("customer_id"));
-                invoice.setCustomerName(resultSet.getString("customer_name"));
-                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
-                invoiceList.add(invoice);
+            if (resultSet.next()) {
+                StatiticsInovice stat = new StatiticsInovice();
+                stat.setDay(resultSet.getInt("day"));
+                stat.setMonth(resultSet.getInt("month"));
+                stat.setYear(resultSet.getInt("year"));
+                stat.setTotalAmount(resultSet.getDouble("total_amount"));
+                return stat;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return invoiceList;
+        return null;
     }
 
     @Override
-    public List<Invoice> getTotalAmountByMonth(LocalDate date, double amount) {
-        String sql = "{CALL total_amount_date_by_month(?)}";
-        List<Invoice> invoiceList = new ArrayList<>();
+    public StatiticsInovice getTotalAmountByMonth(int month, int year) {
+        String sql = "{CALL total_amount_date_by_month(?,?)}";
         try (Connection connection = JDBCUtil.getInstance().getConnection();
              CallableStatement callableStatement = connection.prepareCall(sql)) {
-            callableStatement.setDate(1, Date.valueOf(date));
-            callableStatement.setDouble(2, amount);
+            callableStatement.setInt(1, month);
+            callableStatement.setInt(2, year);
             ResultSet resultSet = callableStatement.executeQuery();
-            while (resultSet.next()) {
-                Invoice invoice = new Invoice();
-                invoice.setId(resultSet.getInt("invoice_id"));
-                invoice.setCustomerId(resultSet.getInt("customer_id"));
-                invoice.setCustomerName(resultSet.getString("customer_name"));
-                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
-                invoiceList.add(invoice);
+
+            if (resultSet.next()) {
+                StatiticsInovice stat = new StatiticsInovice();
+                stat.setMonth(resultSet.getInt("month"));
+                stat.setYear(resultSet.getInt("year"));
+                stat.setTotalAmount(resultSet.getDouble("total_amount"));
+                return stat;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return invoiceList;
+        return null;
     }
 
     @Override
-    public List<Invoice> getTotalAmountByYear(LocalDate date, double amount) {
+    public StatiticsInovice getTotalAmountByYear(int year) {
         String sql = "{CALL total_amount_date_by_year(?)}";
-        List<Invoice> invoiceList = new ArrayList<>();
         try (Connection connection = JDBCUtil.getInstance().getConnection();
              CallableStatement callableStatement = connection.prepareCall(sql)) {
-            callableStatement.setDate(1, Date.valueOf(date));
-            callableStatement.setDouble(2, amount);
+            callableStatement.setInt(1, year);
             ResultSet resultSet = callableStatement.executeQuery();
-            while (resultSet.next()) {
-                Invoice invoice = new Invoice();
-                invoice.setId(resultSet.getInt("invoice_id"));
-                invoice.setCustomerId(resultSet.getInt("customer_id"));
-                invoice.setCustomerName(resultSet.getString("customer_name"));
-                invoice.setCreatedAt(LocalDateTime.parse(resultSet.getString("created_at"), DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-                invoice.setTotalAmount(resultSet.getDouble("total_amount"));
-                invoiceList.add(invoice);
+
+            if (resultSet.next()) {
+                StatiticsInovice stat = new StatiticsInovice();
+                stat.setYear(resultSet.getInt("year"));
+                stat.setTotalAmount(resultSet.getDouble("total_amount"));
+                return stat;
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return invoiceList;
+        return null;
     }
 }

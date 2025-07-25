@@ -1,6 +1,7 @@
 package ra.MD4Project.dao;
 
 import ra.MD4Project.model.Invoice;
+import ra.MD4Project.model.StatiticsInovice;
 
 import java.time.LocalDate;
 
@@ -17,9 +18,9 @@ public interface IInvoiceDAO {
 
     List<Invoice> getInvoiceByDate(LocalDate date);
 
-    List<Invoice> getTotalAmountByDay(LocalDate date, double amount);
+    StatiticsInovice getTotalAmountByDay(int day, int month, int year);
 
-    List<Invoice> getTotalAmountByMonth(LocalDate date, double amount);
+    StatiticsInovice getTotalAmountByMonth(int month, int year);
 
-    List<Invoice> getTotalAmountByYear(LocalDate date, double amount);
+    StatiticsInovice getTotalAmountByYear(int year);
 }

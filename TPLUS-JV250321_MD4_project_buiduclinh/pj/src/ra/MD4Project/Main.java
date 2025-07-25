@@ -1,7 +1,7 @@
 package ra.MD4Project;
 
 import ra.MD4Project.Validate.ValidateInput;
-import ra.MD4Project.presetation.login.Impl.Login;
+import ra.MD4Project.presetation.login.Login;
 
 import java.util.Scanner;
 

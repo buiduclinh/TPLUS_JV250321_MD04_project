@@ -313,6 +313,21 @@ BEGIN
 END $$
 DELIMITER ;
 
+-- lấy số lượng tồn kho
+
+DELIMITER $$
+CREATE PROCEDURE get_product_stock_by_id(
+    IN in_product_id int,
+    OUT in_product_stock int
+)
+BEGIN
+    SELECT stock
+    INTO in_product_stock
+    FROM product
+    WHERE id = in_product_id;
+END $$
+DELIMITER ;
+
 
 -- Hiển thị danh sách hóa đơn
 DELIMITER $$
@@ -402,7 +417,7 @@ BEGIN
                         FROM invoice_details
                         WHERE invoice_id = NEW.invoice_id)
     WHERE id = NEW.invoice_id;
-END$$
+END $$
 DELIMITER ;
 
 
@@ -417,7 +432,7 @@ BEGIN
                         FROM invoice_details
                         WHERE invoice_id = NEW.invoice_id)
     WHERE id = NEW.invoice_id;
-END$$
+END $$
 DELIMITER ;
 
 
@@ -432,7 +447,7 @@ BEGIN
                         FROM invoice_details
                         WHERE invoice_id = OLD.invoice_id)
     WHERE id = OLD.invoice_id;
-END$$
+END $$
 DELIMITER ;
 
 -- tìm kiếm hóa đơn theo tên khách hàng
@@ -481,50 +496,61 @@ CALL find_invoice_by_created_at('2025/07/24');
 
 
 -- thống kê doanh thu theo ngày
+
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_day(
-    IN in_date DATE
+    IN in_day int,
+    IN in_month int,
+    IN in_year int
 )
 BEGIN
-    SELECT SUM(total_amount)
+    SELECT DAY(created_at) AS day, MONTH(created_at) AS month, YEAR(created_at) AS year, SUM(total_amount) AS total_amount
     FROM invoice
-    WHERE DAY(created_at) LIKE CONCAT('%', DAY(in_date), '%');
+    WHERE DAY(created_at) = in_day
+      AND MONTH(created_at) = in_month
+      AND YEAR(created_at) = in_year
+    GROUP BY DAY(created_at), MONTH(created_at), YEAR(created_at);
 END $$
 DELIMITER ;
-CALL total_amount_date_by_day('2025/07/24');
+CALL total_amount_date_by_day('24', '07', '2025');
+
 
 
 -- thống kê doanh thu theo tháng
-
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_month(
-    IN in_date DATE
+    IN in_month int,
+    IN in_year int
 )
 BEGIN
-    SELECT SUM(total_amount)
+    SELECT MONTH(created_at) AS month, YEAR(created_at) AS year, SUM(total_amount) AS total_amount
     FROM invoice
-    WHERE MONTH(created_at) LIKE CONCAT('%', MONTH(in_date), '%')
-      AND YEAR(created_at) LIKE CONCAT('%', YEAR(in_date), '%');
+    WHERE MONTH(created_at) = in_month
+      AND YEAR(created_at) = in_year
+    GROUP BY MONTH(created_at), YEAR(created_at);
 END $$
 DELIMITER ;
-CALL total_amount_date_by_month('2025/07/24');
+CALL total_amount_date_by_month('07', '2025');
 
 
 -- thống kê doanh thu theo năm
 DELIMITER $$
 CREATE PROCEDURE total_amount_date_by_year(
-    IN in_date DATE
+    IN in_year YEAR
 )
 BEGIN
-    SELECT SUM(total_amount)
+    SELECT YEAR(created_at) AS year, SUM(total_amount) AS total_amount
     FROM invoice
-    WHERE YEAR(created_at) LIKE CONCAT('%', YEAR(in_date), '%');
+    WHERE YEAR(created_at) = in_year
+    GROUP BY YEAR(created_at);
 END $$
 DELIMITER ;
-CALL total_amount_date_by_year('2025/07/24');
+CALL total_amount_date_by_year('2025');
+
+
 
 -- thêm mới hóa đơn
-# DROP PROCEDURE add_invoice;
+
 DELIMITER $$
 CREATE PROCEDURE add_invoice(
     IN in_customer_id int,
@@ -568,5 +594,18 @@ BEGIN
     SELECT *
     FROM invoice
     WHERE id = in_invoice_id;
+END $$
+DELIMITER ;
+
+-- thay đổi stock
+DELIMITER $$
+CREATE TRIGGER update_stock_by_quantity
+    AFTER INSERT
+    ON invoice_details
+    FOR EACH ROW
+BEGIN
+    UPDATE product
+    SET stock = stock - NEW.quantity
+    WHERE id = NEW.product_id;
 END $$
 DELIMITER ;

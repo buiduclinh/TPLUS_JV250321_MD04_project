@@ -14,4 +14,5 @@ public interface IPhoneDAO {
     List<Phone> findAllProductByStock(int stock1, int stock2);
     Phone findProductById(int id);
     Phone findProductByName(String name);
+    int getStockProductById(int id);
 }

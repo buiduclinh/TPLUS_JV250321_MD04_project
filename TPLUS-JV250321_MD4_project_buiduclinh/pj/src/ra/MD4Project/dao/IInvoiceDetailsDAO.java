@@ -1,8 +1,9 @@
 package ra.MD4Project.dao;
 
-import ra.MD4Project.model.Invoice;
 import ra.MD4Project.model.InvoiceDetails;
 
+import java.util.List;
+
 public interface IInvoiceDetailsDAO {
-    boolean addInvoiceDetails(InvoiceDetails invoiceDetails);
+    boolean addInvoiceDetails(List<InvoiceDetails> invoiceDetails);
 }

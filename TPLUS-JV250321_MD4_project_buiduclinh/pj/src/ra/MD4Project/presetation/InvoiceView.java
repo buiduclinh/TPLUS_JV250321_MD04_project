@@ -8,9 +8,10 @@ import ra.MD4Project.business.impl.InvoiceDetailsServiceImpl;
 import ra.MD4Project.business.impl.InvoiceServiceImpl;
 import ra.MD4Project.model.Invoice;
 import ra.MD4Project.model.InvoiceDetails;
+import ra.MD4Project.model.StatiticsInovice;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
@@ -57,6 +58,43 @@ public class InvoiceView {
         } while (!next);
     }
 
+    public static void InvoiceViewStatisticsPresentation() {
+        boolean next = false;
+        do {
+            try {
+                System.out.println("================== Thống kê doanh thu ==================");
+                System.out.println("1. Doanh thu theo ngày");
+                System.out.println("2. Doanh thu theo tháng");
+                System.out.println("3. Doanh thu theo năm");
+                System.out.println("4. Quay lại menu chính");
+                String choice = scanner.nextLine();
+                if (ValidateInput.isInt(choice)) {
+                    int option = Integer.parseInt(choice);
+                    switch (option) {
+                        case 1:
+                            StatisticsByDay();
+                            break;
+                        case 2:
+                            StatisticsByMonth();
+                            break;
+                        case 3:
+                            StatisticsByYear();
+                            break;
+                        case 4:
+                            next = true;
+                            break;
+                        default:
+                            System.out.println("Vui lòng chọn từ 1 đến 4");
+                    }
+                } else {
+                    System.out.println("Dữ liệu nhập không hợp lệ!");
+                }
+            } catch (RuntimeException e) {
+                throw new RuntimeException(e);
+            }
+        } while (!next);
+    }
+
     public static void displayInvoice() {
         List<Invoice> invoiceList = invoiceService.getInvoices();
         if (invoiceList.isEmpty()) {
@@ -74,10 +112,36 @@ public class InvoiceView {
         if (result != -1) {
             System.out.println("Thêm mới hóa đơn thành công");
             System.out.println("Thêm chi tiết hóa đơn");
-            invoiceDetails.setInvoiceId(result);
-            invoiceDetails.inputProductId(scanner);
-            invoiceDetails.inputQuantity(scanner);
-            boolean resultDetails = invoiceDetailsService.addInvoiceDetails(invoiceDetails);
+            boolean next = false;
+            List<InvoiceDetails> shopList = new ArrayList<>();
+            do {
+                System.out.println("1. Nhập sản phẩm và số lượng sản phẩm");
+                System.out.println("2. Thoát");
+                String choice = scanner.nextLine();
+                if (ValidateInput.isInt(choice)) {
+                    int option = Integer.parseInt(choice);
+                    switch (option) {
+                        case 1:
+                            invoiceDetails.setInvoiceId(result);
+                            int inputProductId = invoiceDetails.inputProductId(scanner);
+                            invoiceDetails.inputQuantity(scanner, inputProductId);
+                            try {
+                                shopList.add(invoiceDetails);
+                            } catch (RuntimeException e) {
+                                throw new RuntimeException(e);
+                            }
+                            break;
+                        case 2:
+                            next = true;
+                            break;
+                        default:
+                            System.out.println("Dữ liệu nhâp không đúng!");
+                    }
+                } else {
+                    System.out.println("Dữ liệu nhập không đúng! Vui lòng nhập lại!");
+                }
+            } while (!next);
+            boolean resultDetails = invoiceDetailsService.addInvoiceDetails(shopList);
             if (resultDetails) {
                 System.out.println("Thêm mới chi tiết hóa đơn thành công!");
             } else {
@@ -143,5 +207,41 @@ public class InvoiceView {
                 throw new RuntimeException(e);
             }
         } while (!next);
+    }
+
+    public static void StatisticsByDay() {
+        StatiticsInovice stat = new StatiticsInovice();
+        int day = stat.inputDay(scanner);
+        int month = stat.inputMonth(scanner);
+        int year = stat.inputYear(scanner);
+        stat = invoiceService.getTotalAmountByDay(day, month, year);
+        if (stat == null) {
+            System.out.println("Không có hóa đơn nào trùng với thời gian nhập!");
+        } else {
+            System.out.println(stat);
+        }
+    }
+
+    public static void StatisticsByMonth() {
+        StatiticsInovice stat = new StatiticsInovice();
+        int month = stat.inputMonth(scanner);
+        int year = stat.inputYear(scanner);
+        stat = invoiceService.getTotalAmountByMonth(month, year);
+        if (stat == null) {
+            System.out.println("Không có hóa đơn nào trùng với thời gian nhập!");
+        } else {
+            System.out.println(stat);
+        }
+    }
+
+    public static void StatisticsByYear() {
+        StatiticsInovice stat = new StatiticsInovice();
+        int year = stat.inputYear(scanner);
+        stat = invoiceService.getTotalAmountByYear(year);
+        if (stat == null) {
+            System.out.println("Không có hóa đơn nào trùng với thời gian nhập!");
+        } else {
+            System.out.println(stat);
+        }
     }
 }

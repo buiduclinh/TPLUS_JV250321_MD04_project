@@ -15,7 +15,7 @@ public class InvoiceDetails {
     private int quantity;
     private double unitPrice;
 
-    private IPhoneDAO  phoneDAO;
+    private IPhoneDAO phoneDAO;
 
     private IInvoiceDAO invoiceDAO;
 
@@ -78,9 +78,10 @@ public class InvoiceDetails {
         System.out.println("Nhập dữ liệu:");
         inputInvoiceId(scanner);
         inputProductId(scanner);
-        inputQuantity(scanner);
         System.out.println("Hoàn tất nhập dữ liệu!");
-    };
+    }
+
+    ;
 
     public int inputInvoiceId(Scanner scanner) {
         while (true) {
@@ -129,18 +130,23 @@ public class InvoiceDetails {
         }
     }
 
-    public int inputQuantity(Scanner scanner) {
+    public int inputQuantity(Scanner scanner, int inputProductId) {
         while (true) {
             System.out.print("Nhập số lượng sản phẩm: ");
             String quantityInput = scanner.nextLine().trim();
-
+            int quantityStock = phoneDAO.getStockProductById(inputProductId);
             if (ValidateInput.isInt(quantityInput)) {
                 int quantityValue = Integer.parseInt(quantityInput);
                 if (quantityValue > 0) {
-                    setQuantity(quantityValue);
-                    return quantityValue;
+                    if (quantityValue <= quantityStock) {
+                        setQuantity(quantityValue);
+                        return quantityValue;
+                    } else {
+                        System.out.println("Số lượng sản phẩm phải nhỏ hơn số lượng tồn kho");
+                        System.out.println("Số lượng sản phẩm còn trong kho là: " + quantityStock);
+                    }
                 } else {
-                    System.err.println("ID phải lớn hơn 0. Vui lòng nhập lại!");
+                    System.err.println("Số lượng sản phẩm phải lớn hơn 0. Vui lòng nhập lại!");
                 }
             } else {
                 System.err.println("ID không hợp lệ. Chỉ được nhập số nguyên. Vui lòng nhập lại!");

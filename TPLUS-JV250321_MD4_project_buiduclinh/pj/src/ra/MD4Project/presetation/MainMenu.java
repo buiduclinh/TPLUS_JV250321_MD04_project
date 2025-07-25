@@ -32,6 +32,7 @@ public class MainMenu {
                             InvoiceView.InvoiceViewPresentation();
                             break;
                         case 4:
+                            InvoiceView.InvoiceViewStatisticsPresentation();
                             break;
                         case 5:
                             next = true;

@@ -3,11 +3,29 @@ package ra.MD4Project.dao.impl;
 import ra.MD4Project.model.Phone;
 import ra.MD4Project.dao.IPhoneDAO;
 import ra.MD4Project.utils.DBHelper;
+import ra.MD4Project.utils.JDBCUtil;
 
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PhoneDAOImpl implements IPhoneDAO {
+
+    @Override
+    public int getStockProductById(int id) {
+        int stock = 0;
+        String sql = "{CALL get_product_stock_by_id(?,?)}";
+        try (Connection connection = JDBCUtil.getInstance().getConnection();
+             CallableStatement callStmt = connection.prepareCall(sql);) {
+            callStmt.setInt(1, id);
+            callStmt.registerOutParameter(2, Types.INTEGER);
+            callStmt.execute();
+            stock = callStmt.getInt(2);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stock;
+    }
 
     @Override
     public List<Phone> getAllProduct() {
@@ -114,8 +132,8 @@ public class PhoneDAOImpl implements IPhoneDAO {
     @Override
     public Phone findProductById(int id) {
         String sql = "{CALL find_product_by_id(?)}";
-        return DBHelper.executeQuery(sql,rs -> {
-            if(rs.next()) {
+        return DBHelper.executeQuery(sql, rs -> {
+            if (rs.next()) {
                 Phone phone = new Phone();
                 phone.setId(rs.getInt("id"));
                 phone.setName(rs.getString("name"));
@@ -125,14 +143,14 @@ public class PhoneDAOImpl implements IPhoneDAO {
                 return phone;
             }
             return null;
-        },id);
+        }, id);
     }
 
     @Override
     public Phone findProductByName(String name) {
         String sql = "{CALL find_product_by_name(?)}";
-        return DBHelper.executeQuery(sql,rs -> {
-            if(rs.next()) {
+        return DBHelper.executeQuery(sql, rs -> {
+            if (rs.next()) {
                 Phone phone = new Phone();
                 phone.setId(rs.getInt("id"));
                 phone.setName(rs.getString("name"));
@@ -142,6 +160,6 @@ public class PhoneDAOImpl implements IPhoneDAO {
                 return phone;
             }
             return null;
-        },name);
+        }, name);
     }
 }
