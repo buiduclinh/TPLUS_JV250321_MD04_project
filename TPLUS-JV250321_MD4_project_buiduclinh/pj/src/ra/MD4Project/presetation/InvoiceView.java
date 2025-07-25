@@ -6,19 +6,20 @@ import ra.MD4Project.business.IInvoiceDetailsService;
 import ra.MD4Project.business.IInvoiceService;
 import ra.MD4Project.business.impl.InvoiceDetailsServiceImpl;
 import ra.MD4Project.business.impl.InvoiceServiceImpl;
+import ra.MD4Project.dao.IPhoneDAO;
+import ra.MD4Project.dao.impl.PhoneDAOImpl;
 import ra.MD4Project.model.Invoice;
 import ra.MD4Project.model.InvoiceDetails;
 import ra.MD4Project.model.StatiticsInovice;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class InvoiceView {
     private static final Scanner scanner = new Scanner(System.in);
     private static final IInvoiceService invoiceService = new InvoiceServiceImpl();
     private static final IInvoiceDetailsService invoiceDetailsService = new InvoiceDetailsServiceImpl();
+    private static final IPhoneDAO phoneDAO = new PhoneDAOImpl();
 
     public static void InvoiceViewPresentation() {
         boolean next = false;
@@ -114,6 +115,7 @@ public class InvoiceView {
             System.out.println("Thêm chi tiết hóa đơn");
             boolean next = false;
             List<InvoiceDetails> shopList = new ArrayList<>();
+            Map<Integer, Integer> map = new HashMap<>();
             do {
                 System.out.println("1. Nhập sản phẩm và số lượng sản phẩm");
                 System.out.println("2. Thoát");
@@ -124,9 +126,23 @@ public class InvoiceView {
                         case 1:
                             invoiceDetails.setInvoiceId(result);
                             int inputProductId = invoiceDetails.inputProductId(scanner);
-                            invoiceDetails.inputQuantity(scanner, inputProductId);
+                            int quantityProductId = invoiceDetails.inputQuantity(scanner, inputProductId);
                             try {
                                 shopList.add(invoiceDetails);
+                                int quantityStock = phoneDAO.getStockProductById(inputProductId);
+                                int newStock = quantityStock - quantityProductId;
+                                if (map.containsKey(inputProductId)) {
+                                    int stock = map.get(inputProductId);
+                                    int checkStock = stock - quantityProductId;
+                                    if (checkStock < 0) {
+                                        System.out.println("Số lượng sản phẩm nhập vào phải nhỏ hơn số lượng tồn kho " + stock);
+                                    } else {
+                                        map.put(inputProductId, stock);
+                                    }
+                                } else {
+                                    map.put(inputProductId, newStock);
+                                }
+
                             } catch (RuntimeException e) {
                                 throw new RuntimeException(e);
                             }

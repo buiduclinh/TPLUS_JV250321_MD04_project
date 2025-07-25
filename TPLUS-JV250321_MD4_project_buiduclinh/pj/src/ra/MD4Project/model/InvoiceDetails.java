@@ -111,7 +111,6 @@ public class InvoiceDetails {
         while (true) {
             System.out.print("Nhập ID sản phẩm: ");
             String idInput = scanner.nextLine().trim();
-
             if (ValidateInput.isInt(idInput)) {
                 int idValue = Integer.parseInt(idInput);
                 if (idValue > 0) {
